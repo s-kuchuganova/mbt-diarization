@@ -105,6 +105,7 @@ def _collate_fn(batch):
         sources: a list containing B items, each item is K x L x C np.ndarray
         K varies from item to item.
     """
+    
     mixtures, sources = [], []
     mix_infos, s1_infos, s2_infos, sample_rate, L = batch
     # for each utterance
