@@ -1,0 +1,6 @@
+numpy==1.20.0
+pandas==1.2.1
+torch==1.7.1
+torchaudio==0.7.2
+visdom==0.1.8.9
+tqdm==4.59.0
