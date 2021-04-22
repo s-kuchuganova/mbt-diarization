@@ -1,3 +1,6 @@
 [submodule "Conv-TasNet"]
 	path = Conv-TasNet
 	url = https://github.com/kaituoxu/Conv-TasNet
+[submodule "TasNet"]
+	path = TasNet
+	url = https://github.com/kaituoxu/TasNet
