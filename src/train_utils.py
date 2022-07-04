@@ -1,6 +1,3 @@
-
-
-
 def update_ema_variables(model, ema_model, alpha, global_step):
     # Use the true average until the exponential average is more correct
     alpha = min(1 - 1 / (global_step + 1), alpha)
@@ -21,8 +18,8 @@ def remove_pad_and_flat(inputs, inputs_lengths):
     if dim == 4:
         C = inputs.size(1)
     for input, length in zip(inputs, inputs_lengths):
-        if dim == 4: # [B, C, K, L]
-            results.append(input[:,:length].view(C, -1).cpu().numpy())
+        if dim == 4:  # [B, C, K, L]
+            results.append(input[:, :length].view(C, -1).cpu().numpy())
         elif dim == 3:  # [B, K, L]
             results.append(input[:length].view(-1).cpu().numpy())
     return results

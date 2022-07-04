@@ -4,14 +4,14 @@ import os
 import numpy as np
 import torch
 import torch.utils.data as data
-
+from torch.utils.data import Dataset, DataLoader
 import librosa
 
 
-class AudioDataset(data.Dataset):
+class AudioDataset(Dataset):
 
     def __init__(self, json_dir, batch_size,
-                 sample_rate=8000, L=int(8000*0.005)):
+                 sample_rate=8000, L=int(8000 * 0.005)):
         """
         Args:
             json_dir: directory including mix.json, s1.json and s2.json
@@ -23,16 +23,19 @@ class AudioDataset(data.Dataset):
         s2_json = os.path.join(json_dir, 's2.json')
         with open(mix_json, 'r') as f:
             mix_infos = json.load(f)
-            #mix_infos = mix_infos[:10000]
+            # mix_infos = mix_infos[:10000]
         with open(s1_json, 'r') as f:
             s1_infos = json.load(f)
-            #s1_infos = s1_infos[:10000]
+            # s1_infos = s1_infos[:10000]
         with open(s2_json, 'r') as f:
             s2_infos = json.load(f)
-            #s2_infos = s2_infos[:10000]
+            # s2_infos = s2_infos[:10000]
+
         # sort it by #samples (impl bucket)
-        def sort(infos): return sorted(
-            infos, key=lambda info: int(info[1]), reverse=True)
+        def sort(infos):
+            return sorted(
+                infos, key=lambda info: int(info[1]), reverse=True)
+
         sorted_mix_infos = sort(mix_infos)
         sorted_mix_infos = sorted_mix_infos[:3000]
         sorted_s1_infos = sort(s1_infos)
@@ -60,7 +63,7 @@ class AudioDataset(data.Dataset):
         return len(self.minibatch)
 
 
-class AudioDataLoader(data.DataLoader):
+class AudioDataLoader(DataLoader):
     """
     NOTE: just use batchsize=1 here, so drop_last=True makes no sense here.
     """
@@ -98,14 +101,14 @@ def _collate_fn(batch):
     sources_pad = sources_pad.permute((0, 3, 1, 2)).contiguous()
     return mixtures_pad, ilens, sources_pad
 
-    def load_mixtures_and_sources(batch):
+def load_mixtures_and_sources(batch):
     """
     Returns:
         mixtures: a list containing B items, each item is K x L np.ndarray
-        sources: a list containing B items, each item is K x L x C np.ndarray
-        K varies from item to item.
-    """
-    
+            sources: a list containing B items, each item is K x L x C np.ndarray
+            K varies from item to item.
+        """
+
     mixtures, sources = [], []
     mix_infos, s1_infos, s2_infos, sample_rate, L = batch
     # for each utterance
@@ -167,18 +170,17 @@ def load_mixtures(batch):
 def pad_list(xs, pad_value):
     n_batch = len(xs)
     max_len = max(x.size(0) for x in xs)
-    pad = xs[0].new(n_batch, max_len, * xs[0].size()[1:]).fill_(pad_value)
+    pad = xs[0].new(n_batch, max_len, *xs[0].size()[1:]).fill_(pad_value)
     for i in range(n_batch):
         pad[i, :xs[i].size(0)] = xs[i]
     return pad
 
 
 
-    import torch.utils.data as data
 class EvalDataset(data.Dataset):
 
     def __init__(self, mix_dir, mix_json, batch_size,
-                 sample_rate=8000, L=int(8000*0.005)):
+                 sample_rate=8000, L=int(8000 * 0.005)):
         """
         Args:
             mix_dir: directory including mixture wav files
@@ -188,15 +190,18 @@ class EvalDataset(data.Dataset):
         assert mix_dir != None or mix_json != None
         if mix_dir is not None:
             # Generate mix.json given mix_dir
-            #preprocess_one_dir(mix_dir, mix_dir, 'mix',
-                             #  sample_rate=sample_rate)
+            # preprocess_one_dir(mix_dir, mix_dir, 'mix',
+            #  sample_rate=sample_rate)
             mix_json = os.path.join(mix_dir, 'mix.json')
         with open(mix_json, 'r') as f:
             mix_infos = json.load(f)
-           # mix_infos = mix_infos[:10000]
+
+        # mix_infos = mix_infos[:10000]
         # sort it by #samples (impl bucket)
-        def sort(infos): return sorted(
-            infos, key=lambda info: int(info[1]), reverse=True)
+        def sort(infos):
+            return sorted(
+                infos, key=lambda info: int(info[1]), reverse=True)
+
         sorted_mix_infos = sort(mix_infos)
         sorted_mix_infos = sorted_mix_infos[:2000]
         # generate minibach infomations
