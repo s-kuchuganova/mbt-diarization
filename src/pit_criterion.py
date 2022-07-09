@@ -33,7 +33,7 @@ def cal_si_snr_with_pit(source, estimate_source, source_lengths):
     assert source.size() == estimate_source.size()
     B, C, K, L = source.size()
     # Step 1. Zero-mean norm
-    num_samples = (L * source_lengths).view(-1, 1, 1, 1).float()  # [B, 1, 1, 1]
+    num_samples = source_lengths
     mean_target = torch.sum(source, dim=[2, 3], keepdim=True) / num_samples
     mean_estimate = torch.sum(estimate_source, dim=[2, 3], keepdim=True) / num_samples
     zero_mean_target = source - mean_target
@@ -66,6 +66,8 @@ def cal_si_snr_with_pit(source, estimate_source, source_lengths):
     # one-hot, [C!, C, C]
     index = torch.unsqueeze(perms, 2)
     perms_one_hot = source.new_zeros((*perms.size(), C)).scatter_(2, index, 1)
+    perms_one_hot = perms_one_hot.to(torch.float32)
+    pair_wise_si_snr = pair_wise_si_snr.to(torch.float32)
     # [B, C!] <- [B, C, C] einsum [C!, C, C], SI-SNR sum of each permutation
     snr_set = torch.einsum('bij,pij->bp', [pair_wise_si_snr, perms_one_hot])
     max_snr_idx = torch.argmax(snr_set, dim=1)  # [B]
@@ -97,6 +99,7 @@ def reorder_source(source, perms, max_snr_idx):
 
 
 def get_mask(source, source_lengths):
+    source_lengths = source_lengths.int()
     B, _, K, _ = source.size()
     mask = source.new_ones((B, 1, K, 1))
     for i in range(B):

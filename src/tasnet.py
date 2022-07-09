@@ -10,7 +10,7 @@ EPS = 1e-8
 
 
 class TasNet(nn.Module):
-    def __init__(self, L, N, hidden_size, num_layers,
+    def __init__(self, L=40, N=100, hidden_size=100, num_layers=4,
                  bidirectional=True, nspk=2):
         super(TasNet, self).__init__()
         # hyper-parameter
