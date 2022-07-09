@@ -1,11 +1,14 @@
+import os
+import time
+
 import numpy as np
-import pit_criterion
-import tasnet
 import torch
 from tqdm import tqdm
-import numpy as np
+
 import data
 import mixup_breakdown
+import pit_criterion
+import tasnet
 import train_utils
 
 # run this bash command
@@ -85,6 +88,7 @@ for epoch in range(EPOCHS):
         padded_mixture = padded_mixture.to(device)
 
         teacher_pred = teacher_model(padded_mixture, mixture_lengths)
+        # TODO: Break возвращает два элемента: сигнал и шум, которые определяются по PSNR
         new_padded_source = mixup_breakdown.Break(lmbd, teacher_pred, mixture_lengths)
         M, N = teacher_pred.shape[2], teacher_pred.shape[3]
 
@@ -132,7 +136,7 @@ for epoch in range(EPOCHS):
                    file_path)
         print('Saving checkpoint model to %s' % file_path)
     # LOSS to cpu
-    update_ema_variables(student_model, teacher_model, 0.999, epoch + 1)
+    train_utils.update_ema_variables(student_model, teacher_model, 0.999, epoch + 1)
     if i % print_freq == 0:
         print('Epoch {0} | Iter {1} | Average Loss {2:.3f} | '
               'Current Loss {3:.6f} | {4:.1f} ms/batch'.format(
