@@ -11,6 +11,8 @@ import pit_criterion
 import tasnet
 import train_utils
 
+# TODO:Add evaluation in every train script
+
 # run this bash command
 # !cp "TasNet/src/tasnet.py" .
 # import TasNet

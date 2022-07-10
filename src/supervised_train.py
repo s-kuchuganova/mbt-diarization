@@ -5,9 +5,9 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
-from src.dataset import LabeledDataset
-from src.pit_criterion import cal_loss
-from src.tasnet import TasNet
+from dataset import LabeledDataset
+from pit_criterion import cal_loss
+from tasnet import TasNet
 
 # TODO: exps with hidden size
 mix_data = pd.read_csv('/second_4tb/kuchuganova/other/MiniLibriMix/metadata/mixture_train_mix_clean.csv')
@@ -58,4 +58,7 @@ def run_one_epoch(epoch, cross_valid=False):
 
 
 if __name__ == "__main__":
-    run_one_epoch(epoch=1)
+    for epoch in range(10):
+        run_one_epoch(epoch=epoch)
+    torch.save(model, '/second_4tb/kuchuganova/other/tasnet_model.ckpt')
+
